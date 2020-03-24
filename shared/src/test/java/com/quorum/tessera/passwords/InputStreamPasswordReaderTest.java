@@ -17,10 +17,9 @@ public class InputStreamPasswordReaderTest {
 
         final PasswordReader passwordReader = new InputStreamPasswordReader(byteArrayInputStream);
 
-        final String password = passwordReader.readPasswordFromConsole();
+        final char[] password = passwordReader.readPasswordFromConsole();
 
-        assertThat(password).isEqualTo("TRY1");
-
+        assertThat(String.valueOf(password)).isEqualTo("TRY1");
     }
 
     @Test
@@ -29,8 +28,7 @@ public class InputStreamPasswordReaderTest {
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(inputStreamBytes);
         final PasswordReader passwordReader = new InputStreamPasswordReader(byteArrayInputStream);
 
-        final String password = passwordReader.readPasswordFromConsole();
-        assertThat(password).isEmpty();
+        final char[] password = passwordReader.readPasswordFromConsole();
+        assertThat(password.length).isEqualTo(0);
     }
-
 }
