@@ -89,10 +89,10 @@ public class PasswordFileUpdaterWriterTest {
         final List<String> existingPasswords = new ArrayList<>(Arrays.asList("pwd1", "pwd2"));
 
         final KeyData key1 = mock(KeyData.class);
-        when(key1.getPassword()).thenReturn("pwd3");
+        when(key1.getPassword()).thenReturn("pwd3".toCharArray());
 
         final KeyData key2 = mock(KeyData.class);
-        when(key2.getPassword()).thenReturn("pwd4");
+        when(key2.getPassword()).thenReturn("pwd4".toCharArray());
 
         final List<String> existingAndNewPasswords = new ArrayList<>(Arrays.asList("pwd1", "pwd2", "pwd3", "pwd4"));
         final List<KeyData> newKeys = new ArrayList<>(Arrays.asList(key1, key2));
@@ -121,10 +121,10 @@ public class PasswordFileUpdaterWriterTest {
         when(pwdFile.toString()).thenReturn(path);
 
         final KeyData key1 = mock(KeyData.class);
-        when(key1.getPassword()).thenReturn("pwd1");
+        when(key1.getPassword()).thenReturn("pwd1".toCharArray());
 
         final KeyData key2 = mock(KeyData.class);
-        when(key2.getPassword()).thenReturn("pwd2");
+        when(key2.getPassword()).thenReturn("pwd2".toCharArray());
 
         final List<String> newPasswords = new ArrayList<>(Arrays.asList("pwd1", "pwd2"));
         final List<KeyData> newKeys = new ArrayList<>(Arrays.asList(key1, key2));
@@ -155,10 +155,10 @@ public class PasswordFileUpdaterWriterTest {
         when(pwdFile.toString()).thenReturn(path);
 
         final KeyData key1 = mock(KeyData.class);
-        when(key1.getPassword()).thenReturn("pwd1");
+        when(key1.getPassword()).thenReturn("pwd1".toCharArray());
 
         final KeyData key2 = mock(KeyData.class);
-        when(key2.getPassword()).thenReturn("pwd2");
+        when(key2.getPassword()).thenReturn("pwd2".toCharArray());
 
         final List<String> existingAndNewPasswords = new ArrayList<>(Arrays.asList("", "", "pwd1", "pwd2"));
         final List<KeyData> newKeys = new ArrayList<>(Arrays.asList(key1, key2));

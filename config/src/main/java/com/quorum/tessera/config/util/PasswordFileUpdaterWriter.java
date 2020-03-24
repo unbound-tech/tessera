@@ -12,10 +12,7 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,10 +23,10 @@ public class PasswordFileUpdaterWriter {
     private static final Logger LOGGER = LoggerFactory.getLogger(PasswordFileUpdaterWriter.class);
 
     private static final Set<PosixFilePermission> NEW_PASSWORD_FILE_PERMS =
-        Stream.of(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE).collect(Collectors.toSet());
+            Stream.of(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE).collect(Collectors.toSet());
 
     private static final String passwordsMessage =
-        "Configfile must contain \"passwordFile\" field. The \"passwords\" field is no longer supported.";
+            "Configfile must contain \"passwordFile\" field. The \"passwords\" field is no longer supported.";
 
     private final FilesDelegate filesDelegate;
 
@@ -39,7 +36,7 @@ public class PasswordFileUpdaterWriter {
 
     public void updateAndWrite(List<KeyData> newKeys, Config config, Path pwdDest) throws IOException {
         if (Optional.ofNullable(config).map(Config::getKeys).map(KeyConfiguration::getPasswords).isPresent()
-            && !config.getKeys().getPasswords().isEmpty()) {
+                && !config.getKeys().getPasswords().isEmpty()) {
             throw new ConfigException(new RuntimeException(passwordsMessage));
         }
 
@@ -50,7 +47,11 @@ public class PasswordFileUpdaterWriter {
         LOGGER.info("Writing updated passwords to {}", pwdDest);
 
         final List<String> newPasswords =
-            newKeys.stream().map(KeyData::getPassword).collect(Collectors.toList());
+                newKeys.stream()
+                        .map(KeyData::getPassword)
+                        .filter(Objects::nonNull)
+                        .map(String::valueOf)
+                        .collect(Collectors.toList());
         final List<String> passwords;
 
         if (Optional.ofNullable(config.getKeys()).map(KeyConfiguration::getPasswordFile).isPresent()) {
@@ -60,8 +61,8 @@ public class PasswordFileUpdaterWriter {
             passwords = new ArrayList<>();
 
             Optional.ofNullable(config.getKeys())
-                .map(KeyConfiguration::getKeyData)
-                .ifPresent(k -> k.forEach(kk -> passwords.add("")));
+                    .map(KeyConfiguration::getKeyData)
+                    .ifPresent(k -> k.forEach(kk -> passwords.add("")));
         }
 
         passwords.addAll(newPasswords);
@@ -73,5 +74,4 @@ public class PasswordFileUpdaterWriter {
         filesDelegate.write(pwdDest, passwords, APPEND);
         LOGGER.info("Updated passwords written to {}", pwdDest);
     }
-
 }

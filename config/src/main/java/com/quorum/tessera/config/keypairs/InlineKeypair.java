@@ -18,18 +18,17 @@ import javax.xml.bind.annotation.XmlTransient;
 
 public class InlineKeypair implements ConfigKeyPair {
 
-    @XmlElement
-    private final String publicKey;
+    @XmlElement private final String publicKey;
 
     @NotNull
     @XmlElement(name = "config")
     private final KeyDataConfig privateKeyConfig;
 
-    private String password;
+    private char[] password;
 
     private String cachedValue;
 
-    private String cachedPassword;
+    private char[] cachedPassword;
 
     @XmlTransient private KeyEncryptor keyEncryptor;
 
@@ -55,7 +54,10 @@ public class InlineKeypair implements ConfigKeyPair {
     @NotNull
     @Size(min = 1)
     @ValidBase64(message = "Invalid Base64 key provided")
-    @Pattern(regexp = "^((?!NACL_FAILURE).)*$", message = "Could not decrypt the private key with the provided password, please double check the passwords provided")
+    @Pattern(
+            regexp = "^((?!NACL_FAILURE).)*$",
+            message =
+                    "Could not decrypt the private key with the provided password, please double check the passwords provided")
     public String getPrivateKey() {
         final PrivateKeyData pkd = privateKeyConfig.getPrivateKeyData();
 
@@ -79,13 +81,12 @@ public class InlineKeypair implements ConfigKeyPair {
     }
 
     @Override
-    public void withPassword(final String password) {
+    public void withPassword(final char[] password) {
         this.password = password;
     }
 
     @Override
-    public String getPassword() {
+    public char[] getPassword() {
         return this.password;
     }
-
 }

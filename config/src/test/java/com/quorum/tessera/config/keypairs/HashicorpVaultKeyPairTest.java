@@ -22,16 +22,14 @@ public class HashicorpVaultKeyPairTest {
         assertThat(keyPair.getSecretName()).isEqualTo("secretName");
         assertThat(keyPair.getPublicKey()).isEqualTo(null);
         assertThat(keyPair.getPrivateKey()).isEqualTo(null);
-        assertThat(keyPair.getPassword()).isEqualTo("");
+        assertThat(keyPair.getPassword().length).isEqualTo(0);
         assertThat(keyPair.getSecretVersion()).isZero();
     }
 
-
-
     @Test
     public void withPasswordDoesNothing() {
-        assertThat(keyPair.getPassword()).isEqualTo("");
-        keyPair.withPassword("newpwd");
-        assertThat(keyPair.getPassword()).isEqualTo("");
+        assertThat(keyPair.getPassword().length).isEqualTo(0);
+        keyPair.withPassword("newpwd".toCharArray());
+        assertThat(keyPair.getPassword().length).isEqualTo(0);
     }
 }

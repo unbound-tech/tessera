@@ -9,16 +9,14 @@ public class AWSKeyPair implements ConfigKeyPair {
     @XmlElement
     @Pattern(
             regexp = "^[0-9a-zA-Z\\-/_+=.@]*$",
-            message =
-                    "AWS Secrets Manager IDs can only contain alphanumeric characters and the characters /_+=.@-")
+            message = "AWS Secrets Manager IDs can only contain alphanumeric characters and the characters /_+=.@-")
     private final String publicKeyId;
 
     @NotNull
     @XmlElement
     @Pattern(
             regexp = "^[0-9a-zA-Z\\-/_+=.@]*$",
-            message =
-                    "AWS Secrets Manager IDs can only contain alphanumeric characters and the characters /_+=.@-")
+            message = "AWS Secrets Manager IDs can only contain alphanumeric characters and the characters /_+=.@-")
     private final String privateKeyId;
 
     public AWSKeyPair(String publicKeyId, String privateKeyId) {
@@ -47,13 +45,13 @@ public class AWSKeyPair implements ConfigKeyPair {
     }
 
     @Override
-    public void withPassword(String password) {
+    public void withPassword(char[] password) {
         // password not used with Secrets Manager stored keys
     }
 
     @Override
-    public String getPassword() {
+    public char[] getPassword() {
         // no password to return
-        return "";
+        return new char[0];
     }
 }
