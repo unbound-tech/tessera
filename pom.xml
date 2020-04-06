@@ -547,6 +547,13 @@
                 <version>0.11-SNAPSHOT</version>
                 <scope>runtime</scope>
             </dependency>
+			
+			<dependency>
+                <groupId>com.jpmorgan.quorum</groupId>
+                <artifactId>encryption-ub</artifactId>
+                <version>0.11-SNAPSHOT</version>
+                <scope>runtime</scope>
+            </dependency>
 
             <dependency>
                 <groupId>com.jpmorgan.quorum</groupId>
@@ -650,12 +657,6 @@
             <dependency>
                 <groupId>com.jpmorgan.quorum</groupId>
                 <artifactId>key-vault-api</artifactId>
-                <version>0.11-SNAPSHOT</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.jpmorgan.quorum</groupId>
-                <artifactId>unbound-key-vault</artifactId>
                 <version>0.11-SNAPSHOT</version>
             </dependency>
 

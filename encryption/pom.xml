@@ -18,6 +18,7 @@
         <module>encryption-jnacl</module>
         <module>encryption-kalium</module>
         <module>encryption-ec</module>
+		<module>encryption-ub</module>
     </modules>
 
 </project>

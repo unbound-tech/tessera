@@ -14,7 +14,6 @@
         <module>key-vault-api</module>
         <module>hashicorp-key-vault</module>
         <module>aws-key-vault</module>
-        <module>unbound-key-vault</module>
     </modules>
 
     <build>
