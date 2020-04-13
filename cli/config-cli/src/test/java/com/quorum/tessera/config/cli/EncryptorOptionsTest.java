@@ -50,4 +50,16 @@ public class EncryptorOptionsTest {
         assertThat(result.getType()).isEqualTo(EncryptorType.NACL);
         assertThat(result.getProperties()).isEmpty();
     }
+
+    @Test
+    public void encryptorTypeUB() {
+        EncryptorOptions encryptorOptions = new EncryptorOptions();
+        encryptorOptions.type = EncryptorType.UB;
+
+        EncryptorConfig result = encryptorOptions.parseEncryptorConfig();
+
+        assertThat(result).isNotNull();
+        assertThat(result.getType()).isEqualTo(EncryptorType.UB);
+        assertThat(result.getProperties()).isEmpty();
+    }
 }

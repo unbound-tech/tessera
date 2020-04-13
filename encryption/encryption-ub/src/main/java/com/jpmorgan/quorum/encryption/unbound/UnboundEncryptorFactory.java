@@ -1,13 +1,15 @@
 package com.jpmorgan.quorum.encryption.unbound;
 
-import com.quorum.tessera.encryption.*;
+import com.quorum.tessera.encryption.Encryptor;
+import com.quorum.tessera.encryption.EncryptorFactory;
+
 import java.util.Map;
 
 public class UnboundEncryptorFactory implements EncryptorFactory {
 
     @Override
     public String getType() {
-        return "Unbound";
+        return "UB";
     }
 
     @Override

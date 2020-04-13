@@ -30,11 +30,40 @@ public class KeyGeneratorFactoryTest {
     }
 
     @Test
+    public void fileKeyGeneratorWhenKeyVaultConfigNotProvidedEncryptorTypeUB() {
+        final EnvironmentVariableProvider envProvider = mock(EnvironmentVariableProvider.class);
+
+        EncryptorConfig encryptorConfig = mock(EncryptorConfig.class);
+        when(encryptorConfig.getType()).thenReturn(EncryptorType.UB);
+        when(encryptorConfig.getProperties()).thenReturn(Collections.EMPTY_MAP);
+
+        final KeyGenerator keyGenerator = KeyGeneratorFactory.newFactory().create(null, encryptorConfig);
+        when(envProvider.getEnv(anyString())).thenReturn("env");
+
+        assertThat(keyGenerator).isNotNull();
+        assertThat(keyGenerator).isExactlyInstanceOf(FileKeyGenerator.class);
+    }
+
+    @Test
     public void azureVaultKeyGeneratorWhenAzureConfigProvided() {
         final AzureKeyVaultConfig keyVaultConfig = new AzureKeyVaultConfig();
 
         EncryptorConfig encryptorConfig = mock(EncryptorConfig.class);
         when(encryptorConfig.getType()).thenReturn(EncryptorType.EC);
+        when(encryptorConfig.getProperties()).thenReturn(Collections.EMPTY_MAP);
+
+        final KeyGenerator keyGenerator = KeyGeneratorFactory.newFactory().create(keyVaultConfig, encryptorConfig);
+
+        assertThat(keyGenerator).isNotNull();
+        assertThat(keyGenerator).isExactlyInstanceOf(AzureVaultKeyGenerator.class);
+    }
+
+    @Test
+    public void azureVaultKeyGeneratorWhenAzureConfigProvidedEncryptorTypeUB() {
+        final AzureKeyVaultConfig keyVaultConfig = new AzureKeyVaultConfig();
+
+        EncryptorConfig encryptorConfig = mock(EncryptorConfig.class);
+        when(encryptorConfig.getType()).thenReturn(EncryptorType.UB);
         when(encryptorConfig.getProperties()).thenReturn(Collections.EMPTY_MAP);
 
         final KeyGenerator keyGenerator = KeyGeneratorFactory.newFactory().create(keyVaultConfig, encryptorConfig);
@@ -57,6 +86,19 @@ public class KeyGeneratorFactoryTest {
         assertThat(keyGenerator).isExactlyInstanceOf(HashicorpVaultKeyGenerator.class);
     }
 
+    @Test
+    public void hashicorpVaultKeyGeneratorWhenHashicorpConfigProvidedEncryptorTypeUB() {
+        final HashicorpKeyVaultConfig keyVaultConfig = new HashicorpKeyVaultConfig();
+
+        EncryptorConfig encryptorConfig = mock(EncryptorConfig.class);
+        when(encryptorConfig.getType()).thenReturn(EncryptorType.UB);
+        when(encryptorConfig.getProperties()).thenReturn(Collections.EMPTY_MAP);
+
+        final KeyGenerator keyGenerator = KeyGeneratorFactory.newFactory().create(keyVaultConfig, encryptorConfig);
+
+        assertThat(keyGenerator).isNotNull();
+        assertThat(keyGenerator).isExactlyInstanceOf(HashicorpVaultKeyGenerator.class);
+    }
     @Test
     public void awsVaultKeyGeneratorWhenAwsConfigProvided() {
         final DefaultKeyVaultConfig keyVaultConfig = new DefaultKeyVaultConfig();

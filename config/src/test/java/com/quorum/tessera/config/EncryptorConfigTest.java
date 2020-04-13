@@ -47,6 +47,11 @@ public class EncryptorConfigTest {
         otherEncryptorConfig.setType(EncryptorType.EC);
 
         assertThat(encryptorConfig).isNotEqualTo(otherEncryptorConfig);
+
+        EncryptorConfig UBEncryptorConfig = new EncryptorConfig();
+        UBEncryptorConfig.setType(EncryptorType.UB);
+
+        assertThat(encryptorConfig).isNotEqualTo(otherEncryptorConfig);
     }
 
     @Test
@@ -95,6 +100,27 @@ public class EncryptorConfigTest {
 
         EncryptorConfig encryptorConfig = new EncryptorConfig();
         encryptorConfig.setType(EncryptorType.EC);
+        Map<String, String> properties = new HashMap<>();
+        properties.put("greeting", "Hellow");
+        properties.put("something", "ELSE");
+        properties.put("bogus", null);
+
+        encryptorConfig.setProperties(properties);
+        // JaxbUtil.marshal(encryptorConfig, System.out);
+        String result = JaxbUtil.marshalToStringNoValidation(encryptorConfig);
+
+        JsonObject json = Json.createReader(new StringReader(result)).readObject();
+
+        assertThat(json.getJsonObject("properties")).containsKeys("greeting", "something", "bogus");
+        assertThat(json.getJsonObject("properties").getString("greeting")).isEqualTo("Hellow");
+        assertThat(json.getJsonObject("properties").getString("something")).isEqualTo("ELSE");
+    }
+
+    @Test
+    public void marshalUB() {
+
+        EncryptorConfig encryptorConfig = new EncryptorConfig();
+        encryptorConfig.setType(EncryptorType.UB);
         Map<String, String> properties = new HashMap<>();
         properties.put("greeting", "Hellow");
         properties.put("something", "ELSE");
