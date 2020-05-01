@@ -1,22 +1,12 @@
 package com.quorum.tessera.transaction;
 
-import com.quorum.tessera.partyinfo.ResendManager;
-import com.quorum.tessera.data.EncryptedTransactionDAO;
-import com.quorum.tessera.data.EncryptedRawTransactionDAO;
-import com.quorum.tessera.partyinfo.ResendResponse;
-import com.quorum.tessera.partyinfo.ResendRequestType;
-import com.quorum.tessera.partyinfo.ResendRequest;
 import com.quorum.tessera.api.model.*;
-import com.quorum.tessera.data.EncryptedRawTransaction;
-import com.quorum.tessera.data.EncryptedTransaction;
-import com.quorum.tessera.data.MessageHash;
-import com.quorum.tessera.data.MessageHashFactory;
+import com.quorum.tessera.data.*;
 import com.quorum.tessera.enclave.*;
 import com.quorum.tessera.encryption.EncryptorException;
 import com.quorum.tessera.encryption.PublicKey;
-import com.quorum.tessera.partyinfo.PartyInfoService;
+import com.quorum.tessera.partyinfo.*;
 import com.quorum.tessera.transaction.exception.KeyNotFoundException;
-import com.quorum.tessera.partyinfo.PublishPayloadException;
 import com.quorum.tessera.transaction.exception.TransactionNotFoundException;
 import com.quorum.tessera.util.Base64Decoder;
 import org.slf4j.Logger;
@@ -125,8 +115,7 @@ public class TransactionManagerImpl implements TransactionManager {
 
         recipientList.addAll(enclave.getForwardingKeys());
 
-        final List<PublicKey> recipientListNoDuplicate =
-            recipientList.stream().distinct().collect(Collectors.toList());
+        final List<PublicKey> recipientListNoDuplicate = recipientList.stream().distinct().collect(Collectors.toList());
 
         final byte[] raw = sendRequest.getPayload();
 
@@ -183,8 +172,7 @@ public class TransactionManagerImpl implements TransactionManager {
 
         recipientList.add(PublicKey.from(encryptedRawTransaction.getSender()));
 
-        final List<PublicKey> recipientListNoDuplicate =
-            recipientList.stream().distinct().collect(Collectors.toList());
+        final List<PublicKey> recipientListNoDuplicate = recipientList.stream().distinct().collect(Collectors.toList());
 
         final EncodedPayload payload =
                 enclave.encryptPayload(encryptedRawTransaction.toRawTransaction(), recipientListNoDuplicate);
@@ -257,8 +245,9 @@ public class TransactionManagerImpl implements TransactionManager {
                                         partyInfoService.publishPayload(prunedPayload, recipientPublicKey);
                                     } catch (PublishPayloadException ex) {
                                         LOGGER.warn(
-                                                "Unable to publish payload to recipient {} during resend",
-                                                recipientPublicKey.encodeToBase64());
+                                                "Unable to resend payload to recipient with public key {}, due to {}",
+                                                recipientPublicKey.encodeToBase64(),
+                                                ex.getMessage());
                                     }
                                 });
 
@@ -402,5 +391,33 @@ public class TransactionManagerImpl implements TransactionManager {
         encryptedRawTransactionDAO.save(encryptedRawTransaction);
 
         return new StoreRawResponse(encryptedRawTransaction.getHash().getHashBytes());
+    }
+
+    @Override
+    @Transactional
+    public boolean isSender(final String key) {
+        final byte[] hashBytes = base64Decoder.decode(key);
+        final MessageHash hash = new MessageHash(hashBytes);
+        final EncodedPayload payload = this.fetchPayload(hash);
+        return enclave.getPublicKeys().contains(payload.getSenderKey());
+    }
+
+    @Override
+    @Transactional
+    public List<PublicKey> getParticipants(final String ptmHash) {
+        final byte[] hashBytes = base64Decoder.decode(ptmHash);
+        final MessageHash hash = new MessageHash(hashBytes);
+        final EncodedPayload payload = this.fetchPayload(hash);
+
+        // this includes the sender
+        return payload.getRecipientKeys();
+    }
+
+    private EncodedPayload fetchPayload(final MessageHash hash) {
+        return encryptedTransactionDAO
+                .retrieveByHash(hash)
+                .map(EncryptedTransaction::getEncodedPayload)
+                .map(payloadEncoder::decode)
+                .orElseThrow(() -> new TransactionNotFoundException("Message with hash " + hash + " was not found"));
     }
 }
