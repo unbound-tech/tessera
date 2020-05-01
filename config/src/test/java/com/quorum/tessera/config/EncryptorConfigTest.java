@@ -48,10 +48,10 @@ public class EncryptorConfigTest {
 
         assertThat(encryptorConfig).isNotEqualTo(otherEncryptorConfig);
 
-        EncryptorConfig UBEncryptorConfig = new EncryptorConfig();
-        UBEncryptorConfig.setType(EncryptorType.UB);
+        EncryptorConfig ubEncryptorConfig = new EncryptorConfig();
+        ubEncryptorConfig.setType(EncryptorType.UB);
 
-        assertThat(encryptorConfig).isNotEqualTo(otherEncryptorConfig);
+        assertThat(encryptorConfig).isNotEqualTo(ubEncryptorConfig);
     }
 
     @Test

@@ -107,15 +107,14 @@ public class UnboundEncryptor implements Encryptor
         new CK_ATTRIBUTE[]{
           new CK_ATTRIBUTE(CK.DYCKA_UID, uid)
         });
-      int[] handles = Library.C_FindObjects(hSession, 1);
       Library.C_FindObjectsFinal(hSession);
-      int hPrv = handles[0];
 
       CK_ECDH1_DERIVE_PARAMS params = new CK_ECDH1_DERIVE_PARAMS();
       params.kdf = CK.CKD_NULL;
       params.pPublicData = publicKey.getKeyBytes();
       params.pSharedData = null;
-
+      int[] handles = Library.C_FindObjects(hSession, 1);
+      int hPrv = handles[0];
       int hSecret = Library.C_DeriveKey(hSession, new CK_MECHANISM(CK.CKM_ECDH1_DERIVE, params), hPrv, new CK_ATTRIBUTE[]
       {
         new CK_ATTRIBUTE(CK.CKA_TOKEN, false),
