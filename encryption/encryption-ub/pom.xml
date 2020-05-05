@@ -7,8 +7,11 @@
         <artifactId>encryption</artifactId>
         <version>0.10.6-SNAPSHOT</version>
     </parent>
+
     <artifactId>encryption-ub</artifactId>
+    <packaging>jar</packaging>
     <name>encryption-ub</name>
+
     <dependencies>
         <dependency>
             <groupId>com.jpmorgan.quorum</groupId>

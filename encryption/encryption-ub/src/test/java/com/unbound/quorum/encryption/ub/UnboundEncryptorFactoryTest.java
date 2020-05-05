@@ -1,4 +1,4 @@
-package com.jpmorgan.quorum.encryption.unbound;
+package com.unbound.quorum.encryption.ub;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.jpmorgan.quorum.encryption.unbound;
+package com.unbound.quorum.encryption.ub;
 
 import com.quorum.tessera.encryption.Encryptor;
 import com.quorum.tessera.encryption.EncryptorFactory;

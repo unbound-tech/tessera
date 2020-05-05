@@ -1,4 +1,4 @@
-package com.jpmorgan.quorum.encryption.unbound;
+package com.unbound.quorum.encryption.ub;
 
 import com.quorum.tessera.encryption.*;
 import org.junit.Test;
@@ -52,14 +52,6 @@ public class UnboundEncryptorTest {
         LOGGER.info("Encrypted outpout: {}", Base64.getEncoder().encode(cipherText));
         byte[] decryptedText = encryptor.openAfterPrecomputation(cipherText, nonce, masterKey);
         assertThat(decryptedText).containsExactly(clearText);
-    }
-
-    @Test(expected = EncryptorException.class)
-    public void sealAfterPrecomputationInvalidSymmetricCipher() {
-        UnboundEncryptor facade = new UnboundEncryptor();
-        MasterKey masterKey = encryptor.createMasterKey();
-        Nonce nonce = encryptor.randomNonce();
-        facade.sealAfterPrecomputation(plainData, nonce, masterKey);
     }
 
     @Test(expected = EncryptorException.class)

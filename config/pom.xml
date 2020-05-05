@@ -64,6 +64,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.jpmorgan.quorum</groupId>
+            <artifactId>encryption-ub</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
             <scope>test</scope>
