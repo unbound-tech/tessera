@@ -21,7 +21,7 @@
         <dependency>
             <groupId>com.github.unbound-tech</groupId>
             <artifactId>unbound-java-provider</artifactId>
-            <version>2.0.2001.42799</version>
+            <version>2.0.2001.43681</version>
         </dependency>
     </dependencies>
 

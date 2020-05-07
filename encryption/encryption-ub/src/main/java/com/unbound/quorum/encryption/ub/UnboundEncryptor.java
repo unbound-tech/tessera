@@ -1,211 +1,190 @@
 package com.unbound.quorum.encryption.ub;
 
-import com.dyadicsec.cryptoki.*;
+import com.dyadicsec.provider.DYCryptoProvider;
+import com.dyadicsec.provider.ECPublicKey;
+import com.dyadicsec.provider.KeyGenSpec;
+import com.dyadicsec.provider.KeyParameters;
 import com.quorum.tessera.encryption.KeyPair;
 import com.quorum.tessera.encryption.PrivateKey;
 import com.quorum.tessera.encryption.PublicKey;
-import com.quorum.tessera.encryption.SharedKey;
-import com.quorum.tessera.encryption.Encryptor;
-import com.quorum.tessera.encryption.EncryptorException;
-import com.quorum.tessera.encryption.Nonce;
+import com.quorum.tessera.encryption.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.crypto.*;
+import javax.crypto.Cipher;
+import javax.crypto.KeyAgreement;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
 import java.security.*;
+import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.ECGenParameterSpec;
+import java.security.spec.ECPoint;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 
-public class UnboundEncryptor implements Encryptor
-{
-  static final int AES_GCM_IV_LEN = 16;
-  static final int AES_GCM_TAG_LEN = 16;
-  static final int AES_KEY_LEN = 16;
-  static final byte[] P256_OID = new byte[] {0x06, 0x08, 0x2a, (byte)0x86, 0x48, (byte)0xce, 0x3d, 0x03, 0x01, 0x07};
+public class UnboundEncryptor implements Encryptor {
 
-  private final SecureRandom secureRandom = new SecureRandom();
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnboundEncryptor.class);
 
-  public UnboundEncryptor() throws EncryptorException
-  {
-    try { Library.C_Initialize(); }
-    catch (CKR_Exception e)
-    {
-      if (e.errorCode!=CK.CKR_CRYPTOKI_ALREADY_INITIALIZED) throw new EncryptorException("Unable initialize UnboundEncryptor");
+    static final int AES_GCM_IV_LEN = 16;
+    static final int AES_GCM_TAG_LEN = 16;
+    static final int AES_KEY_LEN = 16;
+
+    private final SecureRandom secureRandom = new SecureRandom();
+
+    public UnboundEncryptor() throws EncryptorException {
+        Provider provider = Security.getProvider("DYADIC");
+        if (provider == null) {
+            provider = new DYCryptoProvider();
+            Security.addProvider(provider);
+        }
     }
-  }
 
-  private static byte[] longToBytes(long x)
-  {
-    ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-    buffer.putLong(0, x);
-    return buffer.array();
-  }
-
-  private static long bytesToLong(byte[] bytes)
-  {
-    ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-    buffer.put(bytes, 0, bytes.length);
-    buffer.flip();//need flip
-    return buffer.getLong();
-  }
-
-  @Override
-  public KeyPair generateNewKeys()
-  {
-    CK_SESSION_HANDLE hSession = null;
-    try
-    {
-      hSession = Library.C_OpenSession(0, CK.CKF_RW_SESSION | CK.CKF_SERIAL_SESSION);
-      int[] keyHandles = Library.C_GenerateKeyPair(hSession, new CK_MECHANISM(CK.CKM_EC_KEY_PAIR_GEN),
-      new CK_ATTRIBUTE[]
-      {
-        new CK_ATTRIBUTE(CK.CKA_TOKEN, false),
-        new CK_ATTRIBUTE(CK.CKA_EC_PARAMS, P256_OID),
-      },
-      new CK_ATTRIBUTE[]
-      {
-        new CK_ATTRIBUTE(CK.CKA_TOKEN, true),
-        new CK_ATTRIBUTE(CK.CKA_DERIVE, true),
-        new CK_ATTRIBUTE(CK.CKA_SIGN, false),
-      });
-      int hPub = keyHandles[0];
-      int hPrv = keyHandles[1];
-
-      CK_ATTRIBUTE[] tPub = new CK_ATTRIBUTE[] {new CK_ATTRIBUTE(CK.CKA_EC_POINT)};
-      Library.C_GetAttributeValue(hSession, hPub, tPub);
-      byte[] pubKeyValue = (byte[])tPub[0].pValue;
-
-      Library.C_DestroyObject(hSession, hPub);
-
-      CK_ATTRIBUTE[] tPrv = new CK_ATTRIBUTE[] {new CK_ATTRIBUTE(CK.DYCKA_UID)};
-      Library.C_GetAttributeValue(hSession, hPrv, tPrv);
-      long uid = tPrv[0].getLongValue();
-      byte[] prvKeyValue = longToBytes(uid);
-
-      return new KeyPair(PublicKey.from(pubKeyValue), PrivateKey.from(prvKeyValue));
+    private static byte[] longToBytes(long x) {
+        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        buffer.putLong(0, x);
+        return buffer.array();
     }
-    catch (CKR_Exception e)
-    {
-       throw new EncryptorException("unable to generate key pair");
+
+    private static long bytesToLong(byte[] bytes) {
+        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        buffer.put(bytes, 0, bytes.length);
+        buffer.flip();//need flip
+        return buffer.getLong();
     }
-    finally
-    {
-      try { if (hSession!=null) Library.C_CloseSession(hSession); }
-      catch (CKR_Exception e) { }
+
+    static byte[] ecPointToDer(ECPoint p) {
+        byte[] out = new byte[67];
+        out[0] = 4;
+        out[1] = 65;
+        out[2] = 4;
+
+        byte[] bin = p.getAffineX().toByteArray();
+        int offset = 0;
+        if (bin[0] == 0) offset = 1;
+        System.arraycopy(bin, offset, out, 3 + 32 - bin.length + offset, bin.length - offset);
+
+        bin = p.getAffineY().toByteArray();
+        offset = 0;
+        if (bin[0] == 0) offset = 1;
+        System.arraycopy(bin, offset, out, out.length - bin.length + offset, bin.length - offset);
+        return out;
     }
-  }
 
-  @Override
-  public SharedKey computeSharedKey(PublicKey publicKey, PrivateKey privateKey)
-  {
-    CK_SESSION_HANDLE hSession = null;
-    try
-    {
-      long uid = bytesToLong(privateKey.getKeyBytes());
+    @Override
+    public KeyPair generateNewKeys() {
+        try {
+            KeyParameters keyParams = new KeyParameters();
+            keyParams.setAllowDerive(true);
+            keyParams.setAllowSign(false);
+            KeyPairGenerator gen = KeyPairGenerator.getInstance("EC", "DYADIC");
+            AlgorithmParameterSpec spec = new ECGenParameterSpec("secp256r1");
+            spec = new KeyGenSpec(spec, keyParams);
+            gen.initialize(spec);
+            java.security.KeyPair keyPair = gen.generateKeyPair();
+            ECPublicKey pub = (ECPublicKey) keyPair.getPublic();
+            byte[] pubEncoded = pub.getEncoded();
 
-      hSession = Library.C_OpenSession(0, CK.CKF_RW_SESSION | CK.CKF_SERIAL_SESSION);
-      Library.C_FindObjectsInit(hSession,
-        new CK_ATTRIBUTE[]{
-          new CK_ATTRIBUTE(CK.DYCKA_UID, uid)
-        });
+            byte[] der = ecPointToDer(pub.getW());
+            byte[] hash = MessageDigest.getInstance("SHA-256").digest(der);
 
-
-      CK_ECDH1_DERIVE_PARAMS params = new CK_ECDH1_DERIVE_PARAMS();
-      params.kdf = CK.CKD_NULL;
-      params.pPublicData = publicKey.getKeyBytes();
-      params.pSharedData = null;
-      int[] handles = Library.C_FindObjects(hSession, 1);
-      Library.C_FindObjectsFinal(hSession);
-      int hPrv = handles[0];
-      int hSecret = Library.C_DeriveKey(hSession, new CK_MECHANISM(CK.CKM_ECDH1_DERIVE, params), hPrv, new CK_ATTRIBUTE[]
-      {
-        new CK_ATTRIBUTE(CK.CKA_TOKEN, false),
-        new CK_ATTRIBUTE(CK.CKA_CLASS, CK.CKO_SECRET_KEY),
-        new CK_ATTRIBUTE(CK.CKA_KEY_TYPE, CK.CKK_GENERIC_SECRET),
-        new CK_ATTRIBUTE(CK.CKA_SENSITIVE, false),
-        new CK_ATTRIBUTE(CK.CKA_VALUE_LEN, 32),
-      });
-
-      CK_ATTRIBUTE[] v = { new CK_ATTRIBUTE(CK.CKA_VALUE) };
-      Library.C_GetAttributeValue(hSession, hSecret, v);
-      byte[] secret = (byte[])v[0].pValue;
-
-      Library.C_DestroyObject(hSession, hSecret);
-
-      byte[] digest = MessageDigest.getInstance("SHA-256").digest(secret);
-      return SharedKey.from(digest);
+            return new KeyPair(PublicKey.from(pubEncoded), PrivateKey.from(Arrays.copyOf(hash, 8)));
+        } catch (Exception e) {
+            throw new EncryptorException("unable to generate key pair: " + e.getMessage());
+        }
     }
-    catch (NoSuchAlgorithmException | CKR_Exception e)
-    {
-      throw new EncryptorException("unable to generate shared secret");
-    }
-    finally
-    {
-      try { if (hSession!=null) Library.C_CloseSession(hSession); }
-      catch (CKR_Exception e) { }
-    }
-  }
 
-  @Override
-  public byte[] sealAfterPrecomputation(byte[] message, Nonce nonce, SharedKey sharedKey)
-  {
-    try
-    {
-      Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding", "SunJCE");
-      cipher.init(
-        Cipher.ENCRYPT_MODE,
-        new SecretKeySpec(sharedKey.getKeyBytes(), "AES"),
-        new GCMParameterSpec(AES_GCM_TAG_LEN*8, nonce.getNonceBytes()));
-      return cipher.doFinal(message);
+    static char hexChar(int x) {
+        int hax = x & 0x0f;
+        if (hax < 10) return (char) (hax + '0');
+        return (char) (hax - 10 + 'a');
     }
-    catch (GeneralSecurityException e)
-    {
-      throw new EncryptorException("unable to perform symmetric encryption");
+
+    @Override
+    public SharedKey computeSharedKey(PublicKey publicKey, PrivateKey privateKey) {
+        try {
+            char[] name = new char[20];
+            name[0] = '0';
+            name[1] = 'x';
+            name[2] = '0';
+            name[3] = '0';
+            byte[] uid = privateKey.getKeyBytes();
+            for (int i = 0; i < 8; i++) {
+                name[4 + i * 2] = hexChar(uid[i] >> 4);
+                name[4 + i * 2 + 1] = hexChar(uid[i]);
+            }
+            KeyStore keyStore = KeyStore.getInstance("PKCS11", "DYADIC");
+            keyStore.load(null);
+            java.security.PrivateKey prvKey = (java.security.PrivateKey) keyStore.getKey(new String(name), null);
+            KeyAgreement keyAgree = KeyAgreement.getInstance("ECDH", "DYADIC");
+            keyAgree.init(prvKey);
+
+            KeyFactory kf = KeyFactory.getInstance("EC");
+            LOGGER.info("Encode public key {}", publicKey.encodeToBase64());
+
+            java.security.PublicKey pubKey = kf.generatePublic(new X509EncodedKeySpec(publicKey.getKeyBytes()));
+            keyAgree.doPhase(pubKey, true);
+            byte[] sharedSecret = keyAgree.generateSecret();
+            byte[] hash = MessageDigest.getInstance("SHA-256").digest(sharedSecret);
+            return SharedKey.from(hash);
+        } catch (Exception e) {
+            LOGGER.error("unable to generate shared secret", e);
+            throw new EncryptorException("unable to generate shared secret: " + e.getMessage());
+        }
     }
-  }
 
-  @Override
-  public byte[] openAfterPrecomputation(byte[] cipherText, Nonce nonce, SharedKey sharedKey)
-  {
-    try
-    {
-      Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding", "SunJCE");
-      cipher.init(
-        Cipher.DECRYPT_MODE,
-        new SecretKeySpec(sharedKey.getKeyBytes(), "AES"),
-        new GCMParameterSpec(AES_GCM_TAG_LEN*8, nonce.getNonceBytes()));
-      return cipher.doFinal(cipherText);
+    @Override
+    public byte[] sealAfterPrecomputation(byte[] message, Nonce nonce, SharedKey sharedKey) {
+        try {
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding", "SunJCE");
+            cipher.init(
+                Cipher.ENCRYPT_MODE,
+                new SecretKeySpec(sharedKey.getKeyBytes(), "AES"),
+                new GCMParameterSpec(AES_GCM_TAG_LEN * 8, nonce.getNonceBytes()));
+            return cipher.doFinal(message);
+        } catch (GeneralSecurityException e) {
+            System.out.println(e.toString());
+            throw new EncryptorException("unable to perform symmetric encryption: " + e.getMessage());
+        }
     }
-    catch (GeneralSecurityException e)
-    {
-      throw new EncryptorException("unable to perform symmetric decryption");
+
+    @Override
+    public byte[] openAfterPrecomputation(byte[] cipherText, Nonce nonce, SharedKey sharedKey) {
+        try {
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding", "SunJCE");
+            cipher.init(
+                Cipher.DECRYPT_MODE,
+                new SecretKeySpec(sharedKey.getKeyBytes(), "AES"),
+                new GCMParameterSpec(AES_GCM_TAG_LEN * 8, nonce.getNonceBytes()));
+            return cipher.doFinal(cipherText);
+        } catch (GeneralSecurityException e) {
+            System.out.println(e.toString());
+            throw new EncryptorException("unable to perform symmetric decryption: " + e.getMessage());
+        }
     }
-  }
 
-  @Override
-  public byte[] seal(byte[] message, Nonce nonce, PublicKey publicKey, PrivateKey privateKey)
-  {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public byte[] seal(byte[] message, Nonce nonce, PublicKey publicKey, PrivateKey privateKey) {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public byte[] open(byte[] cipherText, Nonce nonce, PublicKey publicKey, PrivateKey privateKey)
-  {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public byte[] open(byte[] cipherText, Nonce nonce, PublicKey publicKey, PrivateKey privateKey) {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public Nonce randomNonce()
-  {
-    final byte[] nonceBytes = new byte[AES_GCM_IV_LEN];
-    secureRandom.nextBytes(nonceBytes);
-    return new Nonce(nonceBytes);
-  }
+    @Override
+    public Nonce randomNonce() {
+        final byte[] nonceBytes = new byte[AES_GCM_IV_LEN];
+        secureRandom.nextBytes(nonceBytes);
+        return new Nonce(nonceBytes);
+    }
 
-  @Override
-  public SharedKey createSingleKey()
-  {
-    final byte[] keyBytes = new byte[AES_KEY_LEN];
-    secureRandom.nextBytes(keyBytes);
-    return SharedKey.from(keyBytes);
-  }
+    @Override
+    public SharedKey createSingleKey() {
+        final byte[] keyBytes = new byte[AES_KEY_LEN];
+        secureRandom.nextBytes(keyBytes);
+        return SharedKey.from(keyBytes);
+    }
 }
