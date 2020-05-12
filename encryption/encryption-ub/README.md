@@ -31,7 +31,7 @@ To install clientless encryption, execute the following on the same server as Te
     ```
     UKC_CA=/path-to-file/server-ca.p7b
     UKC_PARTITION_NAME=<PARTITION_NAME>
-    UKC_SERVERS=ukc-ep
+    UKC_SERVERS=<EP_HOSTNAME>
     DYLOG_ENABLED=1
     UKC_PFX=<path-to-pfx-file>
     UKC_PFX_PASS=<PFX_PASSWORD>
