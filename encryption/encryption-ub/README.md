@@ -64,8 +64,8 @@ Install the UKC client on the same server as Tessera.
     java -jar tessera-app.jar -keygen --encryptor.type UB -filename <FILENAME>
     ```
     This command creates 2 files:
-    - <FILENAME>.key
-    - <FILENAME>.pub
+    - `<FILENAME>.key`
+    - `<FILENAME>.pub`
 		
 2. Create the Tessara configuration file.
     Create a file containing the Tessera configuration information. See [here](https://github.com/jpmorganchase/quorum-examples#experimenting-with-alternative-curves-in-tessera) for more information.
