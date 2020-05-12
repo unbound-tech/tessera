@@ -67,7 +67,7 @@ Install the UKC client on the same server as Tessera.
     - `<FILENAME>.key`
     - `<FILENAME>.pub`
 		
-2. Create the Tessara configuration file.
+2. Create the Tessera configuration file.
     Create a file containing the Tessera configuration information. See [here](https://github.com/jpmorganchase/quorum-examples#experimenting-with-alternative-curves-in-tessera) for more information.
 
     Set the *encryptor* type to *UB*:
@@ -77,13 +77,13 @@ Install the UKC client on the same server as Tessera.
     },
     ```
 
-    Set the path to the key and public key:
+    Set the paths to the keys:
     ```
 	"keys": {
         "passwords": [],
         "keyData": [
             {
-                "config": $(cat $<FILENAME>.key),
+                "config": "$(cat $<FILENAME>.key)",
                 "publicKey": "$(cat $<FILENAME>.pub)"
             }
         ]
