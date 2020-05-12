@@ -95,11 +95,4 @@ Install the UKC client on the same server as Tessera.
             }
         ]
     },	
-
-
-## Example
-To encrypt a file using a key from UKC:
-```
-java -jar tessera-app.jar -keygen --encryptor.type UB -filename <FILENAME-TO-ENCRYPT>
-```
-
+   ```
