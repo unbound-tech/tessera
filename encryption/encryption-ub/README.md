@@ -3,13 +3,13 @@
 Unbound Key Control ("UKC") protects secrets such as cryptographic keys by ensuring they never exist in complete form.
 
 There are two types of installation:
-1. Clientless Installation
-1. Install with a UKC Client
+1. [Clientless Installation](#Clientless)
+1. [Install with a UKC Client](#Withclient)
 
 ## Prerequisites
 - Install UKC (EP, Partner and Auxiliary servers) version 2.0.2001 and up.
 
-
+<a name="Clientless"></a>
 ## Clientless Installation
 
 To install clientless encryption, execute the following on the same server as Tessera.
@@ -37,6 +37,7 @@ To install clientless encryption, execute the following on the same server as Te
     UKC_PFX_PASS=<PFX_PASSWORD>
     ```
 
+<a name="Withclient"></a>
 ## Install with a UKC Client
 Install the UKC client on the same server as Tessera.
 
@@ -56,5 +57,43 @@ Install the UKC client on the same server as Tessera.
     ucl register --code <ACTIVATION_CODE> --name <CLIENT_NAME> --partition <PARTITION_NAME> -v
     ```
 
+## Using UKC for Encryption with Tessera
+
+1. Create the key and public key.
+    ```
+    java -jar tessera-app.jar -keygen --encryptor.type UB -filename <FILENAME>
+    ```
+    This command creates 2 files:
+	
+	    - <FILENAME>.key
+		- <FILENAME>.pub
+		
+2. Create the Tessara configuration file.
+    Create a file containing the Tessera configuration information. See [here](https://github.com/jpmorganchase/quorum-examples#experimenting-with-alternative-curves-in-tessera) for more information.
+
+    Set the *encryptor* type to *UB*:
+    ```
+    "encryptor": {
+        "type": "UB"
+    },
+    ```
+
+    Set the path to the key and public key:
+    ```
+	"keys": {
+        "passwords": [],
+        "keyData": [
+            {
+                "config": $(cat $<FILENAME>.key),
+                "publicKey": "$(cat $<FILENAME>.pub)"
+            }
+        ]
+    },	
+
+
 ## Example
+To encrypt a file using a key from UKC:
+```
+java -jar tessera-app.jar -keygen --encryptor.type UB -filename <FILENAME-TO-ENCRYPT>
+```
 
