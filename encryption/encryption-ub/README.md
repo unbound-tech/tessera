@@ -6,7 +6,7 @@ To allow Tessera server using the UKC cryptographic services, the UKC SSL client
 
 The UKC certificates may be obtained using one of the following methods:
 
-1. Explicetly create the certificate on the EP server - [Create Certificate](#FullCert)
+1. Explicitly create the certificate on the EP server - [Create Certificate](#FullCert)
 1. Obtain an ephemeral certificate from the cerver
 1. Install UKC client software on the Tessera server and use the standard UKC client registration procedure to obtain the the certificates - [Install with a UKC Client](#Withclient)
 
