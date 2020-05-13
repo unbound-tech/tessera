@@ -35,7 +35,7 @@ The UKC certificates may be obtained using one of the following methods:
    By default, this certificate is valid for three years. To change the default, append the following option:
     
     ```
-    --cert_validity <Validity period of each derived certificate>
+    --cert_validity <Validity period in minutes>
     ```
     
    
