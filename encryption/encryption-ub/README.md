@@ -2,88 +2,139 @@
 
 Unbound Key Control ("UKC") protects secrets such as cryptographic keys by ensuring they never exist in complete form.
 
-There are two types of installation:
-1. [Clientless Installation](#Clientless)
-1. [Install with a UKC Client](#Withclient)
+To allow Tessera server using the UKC cryptographic services, the UKC SSL client certificate and its SSL trust CA certificate must be installed on the Tessera server, and the UKC-related environment variables must be set accordingly.
 
+The UKC certificates may be obtained using one of the following methods:
+
+1. Explicetly create the certificate on the EP server - [Create Certificate](#FullCert)
+1. Obtain an ephemeral certificate from the cerver
+1. Install UKC client software on the Tessera server and use the standard UKC client registration procedure to obtain the the certificates - [Install with a UKC Client](#Withclient)
+
+<a name="Prerequisites"></a>
 ## Prerequisites
 - Install UKC (EP, Partner and Auxiliary servers) version 2.0.2001 and up.
+- Using EP server, create the  UKC partition that will store keys used by the Tessera server (referred below as the PARTITION_NAME).
 
-<a name="Clientless"></a>
-## Clientless Installation
-### Option one to create clientless with pfx
-To install clientless encryption, execute the following on the same server as Tessera.
-1. Create UKC Client
 
-    Run this command to create a UKC client on the UKC EP. The result is a *PFX* file used in the next step.
+## Preparing Tessera Server
+
+<a name="FullCert"></a>
+### Option one: Create Certificate
+1. To create the certificate, run the following command on the EP server.
+
+   Use the <PARTITION_NAME> assigned in [Prerequisites](#Prerequisites).
+   Specify the SO password that allows accessing  the partiton in  the <PARTITION_PASSWORD>
+   Specify Tessara's hostname in the <TESSERA_HOST_NAME>. This value will be included in the certificate.
+   In the --output option, specify the name of the certificate file, for example "tessera-client.pfx".
+   Set the password that protects the content of the certificate in the <PFX_PASSWORD>.
     
     ```
-    ucl client create --mode full --name <CLIENT_NAME> --partition <PARTITION_NAME> --password <UKC_PASSWORD>  --pfx_password <PFX_PASSWORD> --output tessera-client.pfx
+    ucl client create --mode FULL --partition <PARTITION_NAME> --password <PARTITION_PASSWORD> --name <TESSERA_HOST_NAME> --output ./tessera_client.pfx --pfx_password <PFX_PASSWORD>
     ```
-
-2. Server CA
-
-    Copy the server CA from the server to the client device. It can be found in:
+   By default, this certificate is valid for three years. To change the default, append the following option:
     
-    `/etc/ekm/server-ca.p7b`
+    ```
+    --cert_validity <Validity perion of each derived certificate>
+    ```
+    
+   
+1. To obtain the UKC SSL trust certificate (ukc_ca.p7b) run the following command on the EP server.
+   
+   ```
+    ucl root_ca --output ./ukc_ca.p7b
+    ```   
 
-3. Configure Environment Variables on Tessera server
+1. Upload these two files to the Tessera server.
+
+
+1. Configure Environment Variables on Tessera server
 
     The following environment variables need to be configured:
 
     ```
-    UKC_CA=/path-to-file/server-ca.p7b
-    UKC_PARTITION_NAME=<PARTITION_NAME>
     UKC_SERVERS=<EP_HOSTNAME>
+    UKC_PARTITION_NAME=<PARTITION_NAME>
     DYLOG_ENABLED=1
-    UKC_PFX=<path-to-pfx-file>
+    UKC_CA=<path-to-ukc_ca.p7b>
+    UKC_PFX=<path-to-tessera_client.pfx>
     UKC_PFX_PASS=<PFX_PASSWORD>
     ```
-### Option two to create clientless without pfx
-1. Create UKC Client
+
+### Option two: Create Ephemeral Certificate
+This option has the following advantages
+
+- On the EP server you create a template that is used to derive certificates. You specify for how long this template is valid and its access credentials. As long as know the credentials (name and access code) you can use it from any UKC service client multiple times without further need to manage the EP server.
+
+- You obtain the the certificate for the specific period in granularity of minutes. Once this period expires you may obtain the certificate for another period and so forth on as needed basis. For example, you can obtain the certificate on demand for the fixed period, or schedule its availability in advance.
+
+The control is totally on your side without any further engagement with the UKC server admin.
+
+
+1. To create the certificate template, run the following command on the EP server.
+
+   Use the <PARTITION_NAME> assigned in [Prerequisites](#Prerequisites).
+   Specify the SO password that allows accessing  the partiton in  the <PARTITION_PASSWORD>
+   Specify Tessara's hostname in the <TESSERA_HOST_NAME>. This value will be included in the certificate.
+   In the --output option, specify the name of the certificate file, for example "tessera-client.pfx".
+   Set the password that protects the content of the certificate in the <PFX_PASSWORD>.
+    
 
     Run this command to create a UKC client on the UKC EP. The result is a *Activition Code* used in the next step.
     
     ```
-    ucl  client create --mode template --name <CLIENT_NAME> --partition <PARTITION_NAME> --password <UKC_PASSWORD>
+    ucl  client create --mode template --name <TEMPLATE_NAME> --partition <PARTITION_NAME> --password <UKC_PASSWORD>
     ```
-2. Server CA
+    
+    By default, this template is valid for 30 minutes and the certificates derived from it are valid for 20 minutes. To change the defaults, add the following options:
+    
+    ```
+    --ac_validity <The template validity perion in minutes>
+    --cert_validity <Validity perion of each derived certificate>
+    ```
+    
+    The output of this command is <ACTIVATION_CODE> that together with the <TEMPLATE_NAME> allow to Tessera implicitly obtain the required certificates.
+    
+ 1. To obtain the UKC SSL trust certificate (ukc_ca.p7b) run the following command on the EP server.
+   
+   ```
+    ucl root_ca --output ./ukc_ca.p7b
+    ```   
 
-    Copy the server CA from the server to the client device. It can be found in:
+1. Upload this file to the Tessera server.
+
     
-    `/etc/ekm/server-ca.p7b`
-    
-3. Configure Environment Variables on Tessera server
+1. Configure Environment Variables on Tessera server
 
     The following environment variables need to be configured:
 
     ```
-    UKC_CA=/path-to-file/server-ca.p7b
-    UKC_PARTITION_NAME=<PARTITION_NAME>
     UKC_SERVERS=<EP_HOSTNAME>
+    UKC_PARTITION_NAME=<PARTITION_NAME>
     DYLOG_ENABLED=1
+    UKC_CA=<path-to-ukc_ca.p7b>
+    UKC_TEMPLATE_NAME=<TEMPLATE_NAME>
     UKC_ACTIVATION_CODE=<ACTIVATION_CODE>
-    UKC_TEMPLATE_NAME=<CLIENT_NAME>
+
     ```
 <a name="Withclient"></a>
-## Install with a UKC Client
-Install the UKC client on the same server as Tessera.
+### Option three: Use the UKC Client Software
 
-1. Install UKC client.
+If you installed the UKC Client Software on the Tessera server (refer to [UKC User Guide](https://www.unboundtech.com/docs/UKC/UKC_User_Guide/HTML/Content/Products/UKC-EKM/UKC_User_Guide/Installation/ClientInstallation.html)), you can choose the following standard UKC client creation and registration approach to implicitly obtain the required certificates.
 
-    Follow the instructions in the [UKC User Guide](https://www.unboundtech.com/docs/UKC/UKC_User_Guide/HTML/Content/Products/UKC-EKM/UKC_User_Guide/Installation/ClientInstallation.html).
-2. Configure the UKC EP server.   
+
+1. To create the certificate template, run the following command on the EP server.
+
     ```
     ucl client create --mode activate --name <CLIENT_NAME> --partition <PARTITION_NAME> --password <UKC_PASSWORD>
     ```
-3. Edit the configuration file on the UKC client, found in:
+1. On the Terserra server. Edit the configuration file on the UKC client, found in:
 
     `/etc/ekm/client.conf`
     
     Update the server name of the UKC EP. For example:
     
     `servers=<EP_HOSTNAME>`
-4. Configure the UKC client.
+1. On the Terera server. Obtain the necessary certificates
     ```
     ucl register --code <ACTIVATION_CODE> --name <CLIENT_NAME> --partition <PARTITION_NAME> -v
     ```
