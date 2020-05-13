@@ -39,7 +39,7 @@ To install clientless encryption, execute the following on the same server as Te
     UKC_PFX=<path-to-pfx-file>
     UKC_PFX_PASS=<PFX_PASSWORD>
     ```
-### Opetion two to create clientless without pfx
+### Option two to create clientless without pfx
 1. Create UKC Client
 
     Run this command to create a UKC client on the UKC EP. The result is a *Activition Code* used in the next step.
