@@ -11,7 +11,7 @@ There are two types of installation:
 
 <a name="Clientless"></a>
 ## Clientless Installation
-
+### Option one to create clientless with pfx
 To install clientless encryption, execute the following on the same server as Tessera.
 1. Create UKC Client
 
@@ -27,7 +27,7 @@ To install clientless encryption, execute the following on the same server as Te
     
     `/etc/ekm/server-ca.p7b`
 
-3. Configure Environment Variables
+3. Configure Environment Variables on Tessera server
 
     The following environment variables need to be configured:
 
@@ -39,7 +39,26 @@ To install clientless encryption, execute the following on the same server as Te
     UKC_PFX=<path-to-pfx-file>
     UKC_PFX_PASS=<PFX_PASSWORD>
     ```
+### Opetion two to create clientless without pfx
+1. Create UKC Client
 
+    Run this command to create a UKC client on the UKC EP. The result is a *Activition Code* used in the next step.
+    
+    ```
+    ucl  client create --mode template --name <CLIENT_NAME> --partition <PARTITION_NAME> --password <UKC_PASSWORD>
+    ```
+2. Configure Environment Variables on Tessera server
+
+    The following environment variables need to be configured:
+
+    ```
+    UKC_CA=/path-to-file/server-ca.p7b
+    UKC_PARTITION_NAME=<PARTITION_NAME>
+    UKC_SERVERS=<EP_HOSTNAME>
+    DYLOG_ENABLED=1
+    UKC_ACTIVATION_CODE=<ACTIVATION_CODE>
+    UKC_TEMPLATE_NAME=<CLIENT_NAME>
+    ```
 <a name="Withclient"></a>
 ## Install with a UKC Client
 Install the UKC client on the same server as Tessera.
