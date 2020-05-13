@@ -24,15 +24,17 @@ The UKC certificates may be obtained using one of the following methods:
 1. To create the certificate, run the following command on the EP server.
 
     ```
+    ucl client create --mode FULL --partition <PARTITION_NAME> --password <PARTITION_PASSWORD> --name <TESSERA_HOST_NAME> --output ./tessera_client.pfx --pfx_password <PFX_PASSWORD>
+    ```
+Notes:
+    ```
    Use the <PARTITION_NAME> assigned in [Prerequisites].
    Specify the SO password that allows accessing  the partition in  the <PARTITION_PASSWORD>
    Specify Tessara's hostname in the <TESSERA_HOST_NAME>. This value will be included in the certificate.
    In the --output option, specify the name of the certificate file, for example, "tessera-client.pfx".
    Set the password that protects the content of the certificate in the <PFX_PASSWORD>.
     ```    
-    ```
-    ucl client create --mode FULL --partition <PARTITION_NAME> --password <PARTITION_PASSWORD> --name <TESSERA_HOST_NAME> --output ./tessera_client.pfx --pfx_password <PFX_PASSWORD>
-    ```
+
    By default, this certificate is valid for three years. To change the default, append the following option:
     
     ```
@@ -75,17 +77,15 @@ The control is totally on your side without any further engagement with the UKC 
 
 1. To create the certificate template, run the following command on the EP server.
 
+    ```
+    ucl  client create --mode template --name <TEMPLATE_NAME> --partition <PARTITION_NAME>
+    ```
+Notes:
     ```    
     Use the <PARTITION_NAME> assigned in [Prerequisites](#Prerequisites).
     Specify the SO password that allows accessing  the partition in  the <PARTITION_PASSWORD>
     ```    
 
-    Run this command to create a UKC client on the UKC EP. The result is an *Activation Code* used in the next step.
-    
-    ```
-    ucl  client create --mode template --name <TEMPLATE_NAME> --partition <PARTITION_NAME>
-    ```
-    
     By default, this template is valid for 30 minutes and the certificates derived from it are valid for 20 minutes. To change the defaults, add the following options:
     
     ```
