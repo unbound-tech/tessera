@@ -96,7 +96,7 @@ The control is totally on your side without any further engagement with the UKC 
     
  1. To obtain the UKC SSL trust certificate (ukc_ca.p7b) run the following command on the EP server.
    
-   ```
+    ```
     ucl root_ca --output ./ukc_ca.p7b
     ```   
 
