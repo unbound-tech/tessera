@@ -65,7 +65,7 @@ The UKC certificates may be obtained using one of the following methods:
 ### Option two: Obtain Ephemeral Certificate
 This option has the following advantages
 
-- On the EP server, you create a template that is used to derive certificates. You specify for how long this template is valid and its access credentials. As long as you know the credentials (name and access code) you can use it from any UKC service client multiple times without the further need to manage the EP server.
+- On the EP server, you create a template that is used to derive certificates. You specify for how long this template is valid and its access credentials. As long as you know the credentials (name and access code) you can use it  many times without the further need to manage the EP server.
 
 - You obtain the certificate for the specific period in the granularity of minutes. Once this period expires you may obtain the certificate for another period and so forth based on your requirements. For example, you can obtain the certificate on demand for the fixed period, or schedule its availability in advance.
 
