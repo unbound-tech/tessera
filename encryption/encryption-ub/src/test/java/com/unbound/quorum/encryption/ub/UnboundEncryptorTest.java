@@ -13,8 +13,6 @@ import static org.junit.Assert.assertEquals;
 
 public class UnboundEncryptorTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(UnboundEncryptor.class);
-    private static final String plainText = "PlainText";
-    private static final byte[] plainData = plainText.getBytes();
     private final EncryptorFactory facadeFactory = new UnboundEncryptorFactory();
 
     private final UnboundEncryptor encryptor = (UnboundEncryptor) facadeFactory.create();
