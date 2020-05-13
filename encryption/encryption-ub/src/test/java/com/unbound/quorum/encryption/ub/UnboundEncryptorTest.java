@@ -1,14 +1,15 @@
 package com.unbound.quorum.encryption.ub;
 
 import com.quorum.tessera.encryption.*;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Base64;
 
-import static junit.framework.Assert.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class UnboundEncryptorTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(UnboundEncryptor.class);
@@ -18,8 +19,8 @@ public class UnboundEncryptorTest {
 
     private final UnboundEncryptor encryptor = (UnboundEncryptor) facadeFactory.create();
 
-
-    @Test
+    @Ignore("Remove Ignore tag if UKC is running, test should pass if UKC is running")
+    @Test()
     public void computeSharedKey() {
         KeyPair keyPair1 = encryptor.generateNewKeys();
         KeyPair keyPair2 = encryptor.generateNewKeys();
@@ -69,8 +70,9 @@ public class UnboundEncryptorTest {
         assertThat(nonce.getNonceBytes()).hasSize(16);
     }
 
+    @Ignore("Remove Ignore tag if UKC is running, test should pass if UKC is running")
     @Test
-    public void generateNewKeys() throws Exception {
+    public void generateNewKeys() {
         KeyPair keyPair = encryptor.generateNewKeys();
         assertThat(keyPair).isNotNull();
         assertThat(keyPair.getPublicKey()).isNotNull();
