@@ -25,10 +25,8 @@ The UKC certificates may be obtained using one of the following methods:
 
     ```
     ucl client create --mode FULL --partition <PARTITION_NAME> --password <PARTITION_PASSWORD> --name <TESSERA_HOST_NAME> --output ./tessera_client.pfx --pfx_password <PFX_PASSWORD>
-    ```
-Notes:
-
-    ```
+   
+   Notes:
    Use the <PARTITION_NAME> assigned in [Prerequisites].
    Specify the SO password that allows accessing  the partition in  the <PARTITION_PASSWORD>
    Specify Tessara's hostname in the <TESSERA_HOST_NAME>. This value will be included in the certificate.
@@ -80,11 +78,9 @@ The control is totally on your side without any further engagement with the UKC 
 
     ```
     ucl  client create --mode template --name <TEMPLATE_NAME> --partition <PARTITION_NAME>
-    ```
-Notes:
-
-    ```    
-    Use the <PARTITION_NAME> assigned in [Prerequisites](#Prerequisites).
+  
+    Notes:
+    Use the <PARTITION_NAME> assigned in [Prerequisites].
     Specify the SO password that allows accessing  the partition in  the <PARTITION_PASSWORD>
     ```    
 
