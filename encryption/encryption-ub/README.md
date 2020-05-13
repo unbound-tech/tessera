@@ -2,18 +2,18 @@
 
 Unbound Key Control ("UKC") protects secrets such as cryptographic keys by ensuring they never exist in complete form.
 
-To allow Tessera server using the UKC cryptographic services, the UKC SSL client certificate and its SSL trust CA certificate must be installed on the Tessera server, and the UKC-related environment variables must be set accordingly.
+To allow using the UKC cryptographic services, the UKC SSL client certificate and its SSL trust CA certificate must be installed on the Tessera server, and the UKC-related environment variables must be set accordingly.
 
 The UKC certificates may be obtained using one of the following methods:
 
-1. Explicitly create the certificate on the EP server - [Create Certificate](#FullCert)
-1. Obtain an ephemeral certificate from the cerver
-1. Install UKC client software on the Tessera server and use the standard UKC client registration procedure to obtain the the certificates - [Install with a UKC Client](#Withclient)
+1. Explicitly create the certificate on the EP server - [Create Certificate](#FullCert).
+1. Obtain an ephemeral certificate from the server.
+1. Install UKC client software on the Tessera server and use the standard UKC client registration procedure to obtain the  certificates - [Install with a UKC Client](#Withclient).
 
 <a name="Prerequisites"></a>
 ## Prerequisites
-- Install UKC (EP, Partner and Auxiliary servers) version 2.0.2001 and up.
-- Using EP server, create the  UKC partition that will store keys used by the Tessera server (referred below as the PARTITION_NAME).
+- Install UKC (EP, Partner, and Auxiliary servers) version 2.0.2001 and up.
+- Using the EP server, create the  UKC partition that will store keys used by the Tessera server (referred below as the PARTITION_NAME).
 
 
 ## Preparing Tessera Server
@@ -23,9 +23,9 @@ The UKC certificates may be obtained using one of the following methods:
 1. To create the certificate, run the following command on the EP server.
 
    Use the <PARTITION_NAME> assigned in [Prerequisites](#Prerequisites).
-   Specify the SO password that allows accessing  the partiton in  the <PARTITION_PASSWORD>
+   Specify the SO password that allows accessing  the partition in  the <PARTITION_PASSWORD>
    Specify Tessara's hostname in the <TESSERA_HOST_NAME>. This value will be included in the certificate.
-   In the --output option, specify the name of the certificate file, for example "tessera-client.pfx".
+   In the --output option, specify the name of the certificate file, for example, "tessera-client.pfx".
    Set the password that protects the content of the certificate in the <PFX_PASSWORD>.
     
     ```
@@ -34,7 +34,7 @@ The UKC certificates may be obtained using one of the following methods:
    By default, this certificate is valid for three years. To change the default, append the following option:
     
     ```
-    --cert_validity <Validity perion of each derived certificate>
+    --cert_validity <Validity period of each derived certificate>
     ```
     
    
@@ -63,9 +63,9 @@ The UKC certificates may be obtained using one of the following methods:
 ### Option two: Create Ephemeral Certificate
 This option has the following advantages
 
-- On the EP server you create a template that is used to derive certificates. You specify for how long this template is valid and its access credentials. As long as know the credentials (name and access code) you can use it from any UKC service client multiple times without further need to manage the EP server.
+- On the EP server, you create a template that is used to derive certificates. You specify for how long this template is valid and its access credentials. As long as you know the credentials (name and access code) you can use it from any UKC service client multiple times without the further need to manage the EP server.
 
-- You obtain the the certificate for the specific period in granularity of minutes. Once this period expires you may obtain the certificate for another period and so forth on as needed basis. For example, you can obtain the certificate on demand for the fixed period, or schedule its availability in advance.
+- You obtain the certificate for the specific period in the granularity of minutes. Once this period expires you may obtain the certificate for another period and so forth based on your requirements. For example, you can obtain the certificate on demand for the fixed period, or schedule its availability in advance.
 
 The control is totally on your side without any further engagement with the UKC server admin.
 
@@ -73,13 +73,13 @@ The control is totally on your side without any further engagement with the UKC 
 1. To create the certificate template, run the following command on the EP server.
 
    Use the <PARTITION_NAME> assigned in [Prerequisites](#Prerequisites).
-   Specify the SO password that allows accessing  the partiton in  the <PARTITION_PASSWORD>
+   Specify the SO password that allows accessing  the partition in  the <PARTITION_PASSWORD>
    Specify Tessara's hostname in the <TESSERA_HOST_NAME>. This value will be included in the certificate.
-   In the --output option, specify the name of the certificate file, for example "tessera-client.pfx".
+   In the --output option, specify the name of the certificate file, for example, "tessera-client.pfx".
    Set the password that protects the content of the certificate in the <PFX_PASSWORD>.
     
 
-    Run this command to create a UKC client on the UKC EP. The result is a *Activition Code* used in the next step.
+    Run this command to create a UKC client on the UKC EP. The result is an *Activation Code* used in the next step.
     
     ```
     ucl  client create --mode template --name <TEMPLATE_NAME> --partition <PARTITION_NAME> --password <UKC_PASSWORD>
@@ -88,11 +88,11 @@ The control is totally on your side without any further engagement with the UKC 
     By default, this template is valid for 30 minutes and the certificates derived from it are valid for 20 minutes. To change the defaults, add the following options:
     
     ```
-    --ac_validity <The template validity perion in minutes>
-    --cert_validity <Validity perion of each derived certificate>
+    --ac_validity <The template validity period in minutes>
+    --cert_validity <Validity period of each derived certificate>
     ```
     
-    The output of this command is <ACTIVATION_CODE> that together with the <TEMPLATE_NAME> allow to Tessera implicitly obtain the required certificates.
+    The output of this command is <ACTIVATION_CODE>. Together with the <TEMPLATE_NAME> they will let Tessera to obtain its SSL clinet certificate.
     
  1. To obtain the UKC SSL trust certificate (ukc_ca.p7b) run the following command on the EP server.
    
