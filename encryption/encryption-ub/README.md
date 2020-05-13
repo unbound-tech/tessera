@@ -2,13 +2,6 @@
 
 Unbound Key Control ("UKC") protects secrets such as cryptographic keys by ensuring they never exist in complete form.
 
-To allow using the UKC cryptographic services, the UKC SSL client certificate and its SSL trust CA certificate must be installed on the Tessera server, and the UKC-related environment variables must be set accordingly.
-
-The UKC certificates may be obtained using one of the following methods:
-
-1. Explicitly create the certificate on the EP server - [Create Certificate](#FullCert).
-1. Obtain an ephemeral certificate from the server.
-1. Install UKC client software on the Tessera server and use the standard UKC client registration procedure to obtain the  certificates - [Install with a UKC Client](#Withclient).
 
 <a name="Prerequisites"></a>
 ## Prerequisites
@@ -18,8 +11,16 @@ The UKC certificates may be obtained using one of the following methods:
 
 ## Preparing Tessera Server
 
+To allow using the UKC cryptographic services, the UKC SSL client certificate and its SSL trust CA certificate must be installed on the Tessera server, and the environment variables used by the UKC software must be set accordingly.
+
+The UKC certificates may be obtained using one of the following methods:
+
+1. Explicitly create the certificate on the EP server - [Create and Download the Certificate](#FullCert).
+1. Obtain an ephemeral certificate from the server - [Obtain Ephemeral Certificate](#Ephemeral).
+1. Install UKC client software on the Tessera server and use the standard UKC client registration procedure to obtain the  certificates - [Install with a UKC Client](#Withclient).
+
 <a name="FullCert"></a>
-### Option one: Create Certificate
+### Option one: Create and Download the Certificate
 1. To create the certificate, run the following command on the EP server.
 
    Use the <PARTITION_NAME> assigned in [Prerequisites](#Prerequisites).
@@ -60,7 +61,8 @@ The UKC certificates may be obtained using one of the following methods:
     UKC_PFX_PASS=<PFX_PASSWORD>
     ```
 
-### Option two: Create Ephemeral Certificate
+<a name="Ephemeral"></a>
+### Option two: Obtain Ephemeral Certificate
 This option has the following advantages
 
 - On the EP server, you create a template that is used to derive certificates. You specify for how long this template is valid and its access credentials. As long as you know the credentials (name and access code) you can use it from any UKC service client multiple times without the further need to manage the EP server.
