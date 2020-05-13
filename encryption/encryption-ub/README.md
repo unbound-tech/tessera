@@ -47,7 +47,13 @@ To install clientless encryption, execute the following on the same server as Te
     ```
     ucl  client create --mode template --name <CLIENT_NAME> --partition <PARTITION_NAME> --password <UKC_PASSWORD>
     ```
-2. Configure Environment Variables on Tessera server
+2. Server CA
+
+    Copy the server CA from the server to the client device. It can be found in:
+    
+    `/etc/ekm/server-ca.p7b`
+    
+3. Configure Environment Variables on Tessera server
 
     The following environment variables need to be configured:
 
