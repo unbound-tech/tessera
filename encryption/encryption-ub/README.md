@@ -129,16 +129,16 @@ If you installed the UKC Client Software on the Tessera server (refer to [UKC Us
     ```
     ucl client create --mode activate --name <CLIENT_NAME> --partition <PARTITION_NAME> --password <UKC_PASSWORD>
     ```
-1. On the Terserra server. Edit the configuration file on the UKC client, found in:
+1. On the Teserra server. Edit the configuration file on the UKC client, found in:
 
     `/etc/ekm/client.conf`
     
     Update the server name of the UKC EP. For example:
     
     `servers=<EP_HOSTNAME>`
-1. On the Terera server. Obtain the necessary certificates
+1. On the Teserra server. Obtain the necessary certificates
     ```
-    ucl register --code <ACTIVATION_CODE> --name <CLIENT_NAME> --partition <PARTITION_NAME> -v
+    ucl register --code <ACTIVATION_CODE> --name <CLIENT_NAME> --partition <PARTITION_NAME>
     ```
 
 ## Using UKC for Encryption with Tessera
