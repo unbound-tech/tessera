@@ -1,7 +1,6 @@
 package com.unbound.quorum.encryption.ub;
 
 import com.dyadicsec.provider.DYCryptoProvider;
-import com.dyadicsec.provider.ECPublicKey;
 import com.dyadicsec.provider.KeyGenSpec;
 import com.dyadicsec.provider.KeyParameters;
 import com.quorum.tessera.encryption.KeyPair;
@@ -17,6 +16,7 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
 import java.security.*;
+import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECPoint;
