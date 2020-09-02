@@ -55,12 +55,12 @@ The UKC certificates may be obtained using one of the following methods:
     The following environment variables need to be configured:
 
     ```
-    UKC_SERVERS=<EP_HOSTNAME>
-    UKC_PARTITION_NAME=<PARTITION_NAME>
-    DYLOG_ENABLED=1
-    UKC_CA=<path-to-ukc_ca.p7b>
-    UKC_PFX=<path-to-tessera_client.pfx>
-    UKC_PFX_PASS=<PFX_PASSWORD>
+    export UKC_SERVERS=<EP_HOSTNAME>
+    export UKC_PARTITION_NAME=<PARTITION_NAME>
+    export DYLOG_ENABLED=1
+    export UKC_CA=<path-to-ukc_ca.p7b>
+    export UKC_PFX=<path-to-tessera_client.pfx>
+    export UKC_PFX_PASS=<PFX_PASSWORD>
     ```
 
 <a name="Ephemeral"></a>
@@ -107,14 +107,14 @@ The control is totally on your side without any further engagement with the UKC 
     The following environment variables need to be configured:
 
     ```
-    UKC_SERVERS=<EP_HOSTNAME>
-    UKC_PARTITION_NAME=<PARTITION_NAME>
-    DYLOG_ENABLED=1
-    UKC_CA=<path-to-ukc_ca.p7b>
-    UKC_TEMPLATE_NAME=<TEMPLATE_NAME>
-    UKC_ACTIVATION_CODE=<ACTIVATION_CODE>
-
+    export UKC_SERVERS=<EP_HOSTNAME>
+    export UKC_PARTITION_NAME=<PARTITION_NAME>
+    export DYLOG_ENABLED=1
+    export UKC_CA=<path-to-ukc_ca.p7b>
+    export UKC_TEMPLATE_NAME=<TEMPLATE_NAME>
+    export UKC_ACTIVATION_CODE=<ACTIVATION_CODE>
     ```
+    
 <a name="Withclient"></a>
 ### Option three: Use the UKC Client Software
 
